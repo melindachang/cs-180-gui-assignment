@@ -25,19 +25,21 @@ body {
 #big-cookie {
   width: 20rem;
   height: 20rem;
-  border-radius: 100%;
+
   cursor: pointer;
-  background-color: brown;
+
+  -webkit-user-drag: none;
+  user-drag: none;
+
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 
   &:active {
     transform: scale(0.95);
   }
 }
 
-#upgrade-shop {
-}
-
-.upgrade-listing {
-  display: flex;
-  background-color: gray;
+#building-shop {
 }

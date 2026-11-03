@@ -9,23 +9,26 @@
   <body>
     <div id="app">
       <div>
-        <div id="big-cookie"></div>
+        <img id="big-cookie" src="src/assets/cookie.png" />
         <h1>Cookies: <span id="counter">0</span></h1>
         <h2>Cookies per second: <span id="cps-counter">0</span></h2>
       </div>
 
-      <ul id="upgrade-shop">
-        <template id="shop-item">
-          <li>
-            <button type="button">
-              <span class="name"></span>
-              <span class="cps"></span>
-              <span class="cost"></span>
-              <span class="owned"></span>
-            </button>
-          </li>
-        </template>
-      </ul>
+      <div>
+        <h2>Building Shop</h2>
+        <ul id="building-shop">
+          <template id="shop-item">
+            <li>
+              <button type="button">
+                <span class="name"></span>
+                <span class="cps"></span>
+                <span class="cost"></span>
+                <span class="owned"></span>
+              </button>
+            </li>
+          </template>
+        </ul>
+      </div>
     </div>
     <script type="module" src="/src/main.ts"></script>
   </body>

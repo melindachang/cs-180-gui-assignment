@@ -1,19 +1,18 @@
-import { getActiveSubscriber } from "./tracking";
-import type { Subscriber, Dependency } from "./tracking";
+import { getActiveEffect, type Effect } from "./effect";
 
-export class Signal<T> implements Dependency {
+export class Signal<T> {
   #value: T;
-  #subscribers = new Set<Subscriber>();
+  #subscribers = new Set<Effect>();
 
   constructor(value: T) {
     this.#value = value;
   }
 
   get value(): T {
-    const sub = getActiveSubscriber();
-    if (sub) {
-      this.#subscribers.add(sub);
-      sub.addDependency(this);
+    const e = getActiveEffect();
+    if (e) {
+      this.#subscribers.add(e);
+      e.addDependency(this);
     }
     return this.#value;
   }
@@ -24,7 +23,7 @@ export class Signal<T> implements Dependency {
     for (const s of [...this.#subscribers]) s.run();
   }
 
-  unsubscribe(s: Subscriber): void {
-    this.#subscribers.delete(s);
+  unsubscribe(e: Effect): void {
+    this.#subscribers.delete(e);
   }
 }
