@@ -1,0 +1,43 @@
+:root {
+}
+
+html {
+  font-size: 62.5%;
+}
+
+body {
+  font-size: 1.6rem;
+  font-family: sans-serif;
+}
+
+*,
+::before,
+::after,
+::backdrop {
+  box-sizing: border-box;
+}
+
+#app {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+#big-cookie {
+  width: 20rem;
+  height: 20rem;
+  border-radius: 100%;
+  cursor: pointer;
+  background-color: brown;
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+#upgrade-shop {
+}
+
+.upgrade-listing {
+  display: flex;
+  background-color: gray;
+}
