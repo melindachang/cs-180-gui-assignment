@@ -51,7 +51,9 @@ window.addEventListener("DOMContentLoaded", () => {
   }
 
   if (cpsCounter) {
-    cpsCounter.textContent = Math.floor(cps(store)).toLocaleString();
+    bind(store, BUILDING_IDS, () => {
+      cpsCounter.textContent = cps(store).toFixed(1).toLocaleString();
+    });
   }
 
   const storeItemTemplate: HTMLTemplateElement | null = document.querySelector(
