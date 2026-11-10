@@ -1,0 +1,1 @@
+- [ ] overhaul signals to use manual subscription

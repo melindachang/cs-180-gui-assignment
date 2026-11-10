@@ -1,74 +1,111 @@
-import { BUILDINGS } from "./game/data";
-import { Signal, Effect } from "./reactive";
-
+import { BUILDINGS, BUILDING_IDS, type BuildingId } from "./game/data";
+import { bind } from "./reactive/bind";
+import { Store } from "./reactive/store";
 import "./style.css";
 
-export const cookies = new Signal(0);
+export type GameState = {
+  cookies: number;
+  bakeryName: string;
+} & Record<BuildingId, number>;
 
-export const owned: { [key: string]: Signal<number> } = Object.fromEntries(
-  Object.keys(BUILDINGS).map((u) => [u, new Signal(0)]),
-);
-
-export const cost = (id: string) => Math.round(BUILDINGS[id].base_cost * 1.15 ** owned[id].value);
-
-export const cps = () =>
-  Object.keys(BUILDINGS).reduce((sum, id) => sum + BUILDINGS[id].cps * owned[id].value, 0);
-
-const cookieEl = document.querySelector("#big-cookie");
-const counterEl = document.querySelector("#counter")!;
-const cpsCounterEl = document.querySelector("#cps-counter")!;
-const buildingShop = document.querySelector<HTMLUListElement>("#building-shop")!;
-const tpl = document.querySelector<HTMLTemplateElement>("#shop-item")!;
-
-new Effect(() => {
-  counterEl.textContent = Math.floor(cookies.value).toString();
-});
-
-new Effect(() => {
-  cpsCounterEl.textContent = (Math.round(cps() * 100) / 100).toString();
-});
-
-cookieEl?.addEventListener("click", () => {
-  cookies.value += 1;
-});
-
-function shopItem(id: string): HTMLLIElement {
-  const li = tpl.content.firstElementChild!.cloneNode(true) as HTMLLIElement;
-  const btn = li.querySelector("button")!;
-
-  btn.dataset.id = id;
-
-  li.querySelector(".name")!.textContent = BUILDINGS[id].name;
-
-  new Effect(() => {
-    btn.disabled = cookies.value < cost(id);
+export const createGame = () =>
+  new Store<GameState>({
+    cookies: 0,
+    bakeryName: "My Bakery",
+    cursor: 0,
+    grandma: 0,
   });
 
-  new Effect(() => {
-    li.querySelector(".cost")!.textContent = cost(id).toString();
-    li.querySelector(".owned")!.textContent = owned[id].value.toString();
+const store = createGame();
+
+export const cost = (store: Store<GameState>, id: BuildingId) =>
+  Math.floor(BUILDINGS[id].baseCost * 1.15 ** store.get(id));
+
+export const cps = (s: Store<GameState>) =>
+  BUILDING_IDS.reduce((sum, id) => sum + s.get(id) * BUILDINGS[id].cps, 0);
+
+export function buy(store: Store<GameState>, id: BuildingId) {
+  const price = cost(store, id);
+  if (store.get("cookies") < price) return;
+  store.set("cookies", store.get("cookies") - price);
+  store.set(id, store.get(id) + 1);
+}
+
+export function tick(s: Store<GameState>, dtSeconds: number) {
+  s.set("cookies", s.get("cookies") + cps(s) * dtSeconds);
+}
+
+window.addEventListener("DOMContentLoaded", () => {
+  const app = document.querySelector("#app");
+  const bigCookie: HTMLDivElement | null = document.querySelector("#big-cookie");
+  const cookieCounter: HTMLSpanElement | null = document.querySelector("#cookie-counter");
+  const cpsCounter: HTMLSpanElement | null = document.querySelector("#cps-counter");
+  const buildingStore: HTMLUListElement | null = document.querySelector("#building-store");
+
+  bigCookie?.addEventListener("click", () => store.set("cookies", store.get("cookies") + 1));
+
+  if (cookieCounter) {
+    bind(store, ["cookies"], () => {
+      cookieCounter.textContent = Math.floor(store.get("cookies")).toLocaleString();
+    });
+  }
+
+  if (cpsCounter) {
+    cpsCounter.textContent = Math.floor(cps(store)).toLocaleString();
+  }
+
+  const storeItemTemplate: HTMLTemplateElement | null = document.querySelector(
+    "#building-store template",
+  );
+
+  if (storeItemTemplate) {
+    for (const id of BUILDING_IDS) {
+      const item = document.importNode(storeItemTemplate.content, true);
+
+      const icon = item.querySelector(".icon");
+      if (icon) icon.classList.add(`-${BUILDINGS[id].name.toLowerCase()}`);
+
+      const itemName = item.querySelector(".name");
+      if (itemName) itemName.textContent = BUILDINGS[id].name;
+
+      const itemCost = item.querySelector(".cost");
+
+      const itemCps = item.querySelector(".cps");
+      if (itemCps) itemCps.textContent = BUILDINGS[id].cps.toString();
+
+      const itemOwned = item.querySelector(".owned");
+
+      if (itemCost && itemOwned) {
+        bind(store, [id], () => {
+          itemCost.textContent = cost(store, id).toLocaleString();
+          itemOwned.textContent = store.get(id).toLocaleString();
+        });
+      }
+
+      const itemButton: HTMLButtonElement | null = item.querySelector(".button");
+
+      if (itemButton) {
+        itemButton.addEventListener("click", () => {
+          itemButton.dispatchEvent(new CustomEvent("buy", { bubbles: true, detail: { id } }));
+        });
+
+        bind(store, ["cookies", id], () => {
+          itemButton.disabled = store.get("cookies") < cost(store, id);
+        });
+      }
+
+      buildingStore?.appendChild(item);
+    }
+  }
+
+  app?.addEventListener("buy", (e) => {
+    buy(store, (e as CustomEvent<{ id: BuildingId }>).detail.id);
   });
 
-  return li;
-}
-
-buildingShop.append(...Object.keys(BUILDINGS).map(shopItem));
-
-buildingShop.addEventListener("click", (e) => {
-  const btn = (e.target as Element).closest<HTMLButtonElement>("button[data-id]");
-  if (btn) buy(btn.dataset.id);
+  let last = performance.now();
+  setInterval(() => {
+    const now = performance.now();
+    tick(store, (now - last) / 1000);
+    last = now;
+  }, 100);
 });
-
-function buy(id?: string) {
-  if (!id) return;
-
-  const price = cost(id);
-  if (cookies.value < price) return;
-  cookies.value -= price;
-  owned[id].value += 1;
-}
-
-setInterval(() => {
-  cookies.value += cps();
-}, 1000);
-

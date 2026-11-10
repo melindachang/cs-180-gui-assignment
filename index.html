@@ -8,22 +8,37 @@
   </head>
   <body>
     <div id="app">
-      <div>
-        <img id="big-cookie" src="src/assets/cookie.png" />
-        <h1>Cookies: <span id="counter">0</span></h1>
-        <h2>Cookies per second: <span id="cps-counter">0</span></h2>
+      <div class="panel -cookie">
+        <div class="stats-banner">
+          <h1><span id="cookie-counter">0</span> cookies</h1>
+          <h2>Cookies per second: <span id="cps-counter">0</span></h2>
+        </div>
+        <div id="big-cookie" role="button">
+          <img src="src/assets/cookie.png" alt="Cookie" />
+        </div>
       </div>
 
-      <div>
-        <h2>Building Shop</h2>
-        <ul id="building-shop">
-          <template id="shop-item">
-            <li>
-              <button type="button">
-                <span class="name"></span>
-                <span class="cps"></span>
-                <span class="cost"></span>
-                <span class="owned"></span>
+      <div class="vertical-separator"></div>
+
+      <div class="panel -store">
+        <h1>Store</h1>
+        <ul id="building-store">
+          <template>
+            <li class="item">
+              <button class="button">
+                <div class="icon"></div>
+                <div class="info">
+                  <div class="left">
+                    <span class="name"></span>
+                    <div class="stats">
+                      <div class="icon -cost"></div>
+                      <span class="cost"></span>
+                      <div class="icon -cps"></div>
+                      <span class="cps"></span>
+                    </div>
+                  </div>
+                  <span class="owned"></span>
+                </div>
               </button>
             </li>
           </template>

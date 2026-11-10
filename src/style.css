@@ -1,13 +1,15 @@
-:root {
-}
+@import url("https://fonts.googleapis.com/css2?family=STIX+Two+Text:ital,wght@0,400..700;1,400..700&display=swap");
 
-html {
-  font-size: 62.5%;
+:root {
+  --text-base: #ffffff;
+  --font-serif: "STIX Two Text", serif;
 }
 
 body {
-  font-size: 1.6rem;
-  font-family: sans-serif;
+  margin: 0;
+
+  font-family: var(--font-serif);
+  color: var(--text-base);
 }
 
 *,
@@ -18,28 +20,241 @@ body {
 }
 
 #app {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-}
+  height: 100vh;
 
-#big-cookie {
-  width: 20rem;
-  height: 20rem;
+  display: flex;
 
-  cursor: pointer;
+  > .panel {
+    position: relative;
 
-  -webkit-user-drag: none;
-  user-drag: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
+    background-image: url("./assets/starbg.jpg");
 
-  &:active {
-    transform: scale(0.95);
+    &.-cookie {
+      flex: 1;
+      justify-content: center;
+    }
+
+    &.-store {
+      > h1 {
+        width: 100%;
+        margin: 0;
+        padding: 0.5rem;
+
+        font-size: 2rem;
+        text-align: center;
+
+        background-image: url("./assets/blackGradientSmallTop.png");
+      }
+    }
   }
 }
 
-#building-shop {
+.stats-banner {
+  position: absolute;
+  top: 10%;
+
+  width: 100%;
+  padding: 1rem 0;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  background-color: rgba(0, 0, 0, 0.5);
+
+  > h1,
+  > h2 {
+    margin: 0;
+
+    font-weight: 900;
+  }
+
+  > h1 {
+    font-size: 2rem;
+  }
+
+  > h2 {
+    font-size: 1.25rem;
+  }
+}
+
+#big-cookie {
+  position: relative;
+  transform-style: preserve-3d;
+
+  > img {
+    width: 24rem;
+    height: 24rem;
+
+    cursor: pointer;
+
+    -webkit-user-drag: none;
+    user-drag: none;
+
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+
+    &:active {
+      transform: scale(0.95);
+    }
+  }
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 1rem;
+    z-index: -1;
+    border-radius: 100%;
+
+    animation: cookieGlow 1s ease-in-out infinite alternate;
+  }
+}
+
+#building-store {
+  padding: 1rem 0 0 0;
+  margin: 0;
+  width: 18.75rem;
+
+  list-style: none;
+
+  background:
+    url("./assets/panelGradientLeft.png") left top no-repeat,
+    url("./assets/panelGradientRight.png") right top no-repeat,
+    url("./assets/panelHorizontal.png?v=2") repeat-x;
+
+  > .item {
+    height: 4rem;
+    width: 100%;
+
+    display: flex;
+
+    background-image: url("./assets/store_tile.jpg");
+    background-size: cover;
+
+    > .button {
+      flex: 1;
+
+      display: flex;
+
+      cursor: pointer;
+      background: none;
+      border: none;
+
+      color: var(--text-base);
+      font-family: var(--font-serif);
+
+      &[disabled] {
+        opacity: 0.6;
+      }
+
+      &:focus,
+      &:active {
+        outline: none;
+        border: none;
+      }
+      > .icon {
+        width: 4rem;
+        height: 4rem;
+
+        background-image: url("./assets/buildings.png");
+        filter: drop-shadow(rgb(0, 0, 0) 0px 3px 2px);
+
+        &.-cursor {
+          background-position: 0 0;
+        }
+
+        &.-grandma {
+          background-position: 0 -4rem;
+        }
+      }
+
+      > .info {
+        padding: 0.5rem;
+
+        flex: 1;
+        display: flex;
+        justify-content: space-between;
+
+        -webkit-user-drag: none;
+        user-drag: none;
+
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+
+        > .left {
+          display: flex;
+          flex-direction: column;
+
+          > .name {
+            font-weight: 900;
+            font-size: 1.75rem;
+            line-height: 1;
+            text-shadow: 0 1px 4px black;
+          }
+
+          > .stats {
+            display: flex;
+            gap: 0.25rem;
+            font-weight: 700;
+            text-shadow: 0 1px 4px black;
+
+            > .icon {
+              width: 1rem;
+              height: 1rem;
+
+              background-image: url("./assets/icons.png");
+              background-size: 36rem 37rem;
+
+              &.-cost {
+                background-position: -10rem 0;
+              }
+
+              &.-cps {
+                background-position: -8rem 0;
+              }
+            }
+          }
+        }
+
+        > .owned {
+          font-size: 2.5rem;
+          font-weight: 700;
+
+          color: #000;
+          text-shadow: 0px 0px 8px #fff;
+          letter-spacing: -1px;
+
+          opacity: 0.2;
+        }
+      }
+    }
+  }
+}
+
+.vertical-separator {
+  width: 1rem;
+
+  background:
+    url("./assets/panelGradientTop.png") left top no-repeat,
+    url("./assets/panelGradientBottom.png") left bottom no-repeat,
+    url("./assets/panelVertical.png?v=2") repeat-y;
+}
+
+@keyframes cookieGlow {
+  from {
+    background-color: rgba(255, 255, 255, 0.4);
+    filter: blur(4rem);
+  }
+  to {
+    background-color: rgba(255, 255, 255, 0.4);
+    filter: blur(3rem);
+  }
 }
